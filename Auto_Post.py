@@ -2,6 +2,9 @@ import docx
 import random
 import tweepy
 from API_Keys import API_key, secret_key, access_token, secret_access_token
+import time
+import schedule
+from datetime import datetime
 
 def first_filter(doc):
     doc1 = docx.Document(doc)
@@ -32,13 +35,19 @@ def tweeter(API_key, secret_key, access_token, secret_access_token):
     auth.set_access_token(access_token, secret_access_token)
     return tweepy.API(auth)
 
+def posting():
+    doc = ("Inspirational Quotes.docx")
+    ff = first_filter(doc)
+    new_list = remove_spaces(ff)
+    random.shuffle(new_list)
+    random_quote = (new_list[0])
+    access = tweeter(API_key, secret_key, access_token, secret_access_token)
+    access.update_status(f"{random_quote}")
+    now = datetime.now()
+    print(f"Tweet at {now} Successful")
 
-doc = ("Inspirational Quotes.docx")
-ff = first_filter(doc)
-new_list = remove_spaces(ff)
-random.shuffle(new_list)
-random_quote = (new_list[0])
-access = tweeter(API_key, secret_key, access_token, secret_access_token)
-access.update_status(f"{random_quote}")
-print("Tweet Successful")
+schedule.every(4).hours.do(posting)
 
+while True:
+    schedule.run_pending()
+    time.sleep(15)
